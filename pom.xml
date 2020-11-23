@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>de.noamo</groupId>
 	<artifactId>universe2</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>RELEASE</version>
 	<name>universe2</name>
 	<description>Universe2 Server by noamo.de</description>
 
