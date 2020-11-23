@@ -1,22 +1,26 @@
 package de.noamo.universe2;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
+import java.util.Properties;
 import java.util.Scanner;
 
 @SpringBootApplication
 public class Universe2Application {
-    @Value("${server.ssl.key-alias}")
+    private static final Properties properties = new Properties();
     private static String host = null;
     private static String certificatePath = null;
 
     public static void main(String[] args) {
         interpretArgs(args);
         importCertificateInJKS();
-        SpringApplication.run(Universe2Application.class, args);
+
+        // Spring Application starten
+        SpringApplication springApplication = new SpringApplication(Universe2Application.class);
+        springApplication.setDefaultProperties(properties);
+        springApplication.run(args);
     }
 
     private static void interpretArgs(String[] args) {
@@ -47,7 +51,7 @@ public class Universe2Application {
             }
 
             // Prüfen, ob Datei den dirketen Pfad oder nginx Datei enthält
-            if (temp.getName().equals("last_nginx.conf")) {
+            if (temp.getName().endsWith(".conf")) {
 
                 // nginx interpretieren (nur Unix)
                 log(0, "Zertifikat-Argument als nginx Konigurationsdatei erkannt");
@@ -81,6 +85,12 @@ public class Universe2Application {
                     "-name " + host);
             int exitVal1 = p1.waitFor();
             if (exitVal1 != 0) throw new Exception("Error PEM to PKCS12");
+
+            // Properties in SpringBoot einfügen
+            properties.setProperty("server.ssl.key-store-type", "PKCS12");
+            properties.setProperty("server.ssl.key-store", "classpath:universe.pkcs12");
+            properties.setProperty("server.ssl.key-store-password", "temppw");
+            properties.setProperty("server.ssl.key-alias", host);
 
             // Log ausgeben
             log(1, "Zertifikat fuer " + host + " erfolgreich eingelesen");
