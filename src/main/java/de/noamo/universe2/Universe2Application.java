@@ -54,6 +54,7 @@ public class Universe2Application {
             if (temp.getName().endsWith(".conf")) {
 
                 // nginx interpretieren (nur Unix)
+                certificatePath = null;
                 log(0, "Zertifikat-Argument als nginx Konigurationsdatei erkannt");
                 Scanner scanner = new Scanner(temp);
                 while (scanner.hasNextLine()) {
@@ -63,10 +64,13 @@ public class Universe2Application {
                         line = "/" + line.substring(0, line.length() - 1);
                         log(0, "Erkannter Pfad des Zertifikates: " + line);
                         certificatePath = line;
+                        break;
                     }
                 }
-                log(2, "\"last_nginx.conf\"-Datei konnte nicht interpretiert werden. Es wird daher kein Zertifikat verwendet!");
-                return;
+                if (certificatePath == null) {
+                    log(2, "\"last_nginx.conf\"-Datei konnte nicht interpretiert werden. Es wird daher kein Zertifikat verwendet!");
+                    return;
+                }
             }
 
             // Zielpfad vorbereiten
